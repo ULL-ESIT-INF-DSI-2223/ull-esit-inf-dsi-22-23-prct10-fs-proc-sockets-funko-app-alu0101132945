@@ -1,3 +1,4 @@
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ULL-ESIT-INF-DSI-2223_ull-esit-inf-dsi-22-23-prct10-fs-proc-sockets-funko-app-alu0101132945&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=ULL-ESIT-INF-DSI-2223_ull-esit-inf-dsi-22-23-prct10-fs-proc-sockets-funko-app-alu0101132945)
 # Práctica 10 - APIs asíncronas de gestión del sistema de ficheros, creación de procesos y creación de sockets de Node.js
 
 En esta práctica, se plantean algunos ejercicios que deberá resolver haciendo uso de las APIs asíncronas de gestión del sistema de ficheros (módulo fs), de creación de procesos (módulo child_process) y de creación de sockets (módulo net) de Node.js.
