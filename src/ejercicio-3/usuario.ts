@@ -96,13 +96,13 @@ export class FunkoUserStorage{
      * metodo que añade un funko al map del usuario y a su directorio
      * @param funko funko que se va a añadir al usuario
      */
-    public addFunko(funko:Funko):void{
+    public addFunko(funko:Funko): string{
         if(this.funkomap.has(funko.getID())){
-            console.error(chalk.red(`El funko con ID ${funko.getID()} ya existe en la lista`));
+            return (chalk.red(`El funko con ID ${funko.getID()} ya existe en la lista`));
         }else{
             this.funkomap.set(funko.getID(),funko);
             this.funkoSave(funko);
-            console.log(chalk.green(`Funko con ID ${funko.getID()} añadido a la lista`));
+            return (chalk.green(`Funko con ID ${funko.getID()} añadido a la lista`));
         }
     }
 
@@ -110,12 +110,12 @@ export class FunkoUserStorage{
      * metodo que actualiza los datos de un funko del usuario
      * @param funko funko que va a ser actualizado
      */
-    public updateFunko(funko: Funko):void{
+    public updateFunko(funko: Funko):string{
         const id = funko.getID();
 
         const filedir = path.join(this.userDir,`${this.funkomap.get(id)?.getName()}.json`)
         if(!fs.existsSync(filedir)){
-            console.error(chalk.red(`No se encontro ningun funko con ID ${funko.getID()} en la lista`))
+            return (chalk.red(`No se encontro ningun funko con ID ${funko.getID()} en la lista`))
         }else{
             const funkofile = fs.readFileSync(filedir,'utf-8')
             const funkodata= JSON.parse(funkofile)
@@ -124,7 +124,7 @@ export class FunkoUserStorage{
             this.funkomap.delete(funko2.getID())    
             this.funkomap.set(id,funko);
             this.funkoSave(funko);
-            console.log(chalk.green(`funko con ID ${funko.getID()} modificado en la lista`));
+            return (chalk.green(`funko con ID ${funko.getID()} modificado en la lista`));
         }
     }
 
@@ -132,41 +132,43 @@ export class FunkoUserStorage{
      * metodo que borra un funko del map y del directorio del usuario
      * @param id id del funko que va a ser borrado
      */
-    public removeFunko(id:number):void{
+    public removeFunko(id:number):string{
         const funko = this.getFunko(id);
         if(funko){
             this.funkomap.delete(id);
             this.funkoDelete(funko);
-            console.log(chalk.green(`funko con ID ${id} eliminado de la lista`))
+            return (chalk.green(`funko con ID ${id} eliminado de la lista`))
         }else{
-            console.error(chalk.red(`No se encontro ningun funko con ID ${id} en la lista`))
+            return (chalk.red(`No se encontro ningun funko con ID ${id} en la lista`))
         }
     }
 
     /**
      * metodo que devuelve los funkos de un usuario con sus datos
      */
-    public listFunko(){
-
+    public listFunko():string{
+        let result = ''
         this.funkomap.forEach(funko => {
-            console.log(`-------------------------------`)
-            this.showFunko(funko.getID());
+            result += `-------------------------------\n`
+            result += this.showFunko(funko.getID());
+            result += `\n`
         });
+        return result;
     }
 
     /**
      * metodo que muestra los datos de un funko en concreto
      * @param id id del funko del que se buscan los datos
      */
-    public showFunko(id:number):void{
+    public showFunko(id:number):string{
         const funko = this.getFunko(id);
         if (funko) {
             const color = this.funkoColor(funko);
             const info = chalk.hex(color)(`ID: ${funko.getID()}\n Nombre: ${funko.getName()}\n Descripcion: ${funko.getDesc()}\n Tipo: ${funko.getTipo()}\n Genero: ${funko.getGen()}\n Franquicia: ${funko.getFran()}\n Numero: ${funko.getNum()}\n Exclusivo: ${funko.getExc()}\n Especial: ${funko.getEsp()}\n Precio ${funko.getVal()}€`)
-            console.log(info);
+            return info;
             
         } else {
-            console.error(chalk`{red.bold No se encontró ningún Funko con ID ${id} en la lista.}`);
+            return (chalk.red(`No se encontró ningún Funko con ID ${id} en la lista.`));
         }
     }
     public getMap(){return this.funkomap}

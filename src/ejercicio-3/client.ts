@@ -1,18 +1,15 @@
+import net from 'net';
+import readline from 'readline'
+import { RequestType,ResponseType } from './tipos.js';
 import { Funko} from './funko.js';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import {FunkoUserStorage} from './usuario.js';
 
-/**
- * Ejecucion:
- * 
- * $ node dist/funkoApp/funko-app.js add --user 'user1' --id 1 --name 'Classic Sonic' --desc 'The best Sonic Funko ever' --type 'p' --gener 'g' --franq 'Sonic' --num 400 --excl false --carac 'Quick Funko' --value 30.15
- * $ node dist/funkoApp/funko-app.js modify --user 'user1' --id 1 --name 'New Sonic' --desc 'A better Sonic Funko' --type 'pr' --gener 'g' --franq 'Sonic' --num 400 --excl true --carac 'Quick Funko' --value 60.87
- * $ node dist/funkoApp/funko-app.js remove --user 'user1' --id 1
- * $ node dist/funkoApp/funko-app.js list --user 'user1'
- * $ node dist/funkoApp/funko-app.js show --user 'user1' --id 1
- * 
- */
+const socket = new net.Socket();
+
+socket.connect(3000, 'localhost', () => {
+    console.log('Te has conectado al servidor');
+});
 
 yargs(hideBin(process.argv))
     .command('add', 'Añadir un funko', {
@@ -73,8 +70,20 @@ yargs(hideBin(process.argv))
     }
 
     }, (argv) => {
-    let user: FunkoUserStorage = new FunkoUserStorage(argv.user);
-    user.addFunko(new Funko(argv.id, argv.name, argv.desc,argv.type,argv.gener, argv.franq, argv.num, argv.excl, argv.esp, argv.val));
+        const funko =new Funko(argv.id, argv.name, argv.desc,argv.type,argv.gener, argv.franq, argv.num, argv.excl, argv.esp, argv.val);
+        const request:RequestType = {
+            type:'add',
+            username: argv.user,
+            funkoPop: funko
+        }
+        socket.emit('request',request)
+        socket.on('response',(response:ResponseType)=>{
+            if(response.success){
+                console.log(response.successmsg)
+            }else{
+                console.error('No se pasaron los argumentos correctos al servidor')
+            }
+        })
     })
 
     .command('update', 'actualiza un funko', {
@@ -135,8 +144,20 @@ yargs(hideBin(process.argv))
         }
     
     }, (argv) => {
-    const user = new FunkoUserStorage(argv.user);
-    user.updateFunko(new Funko(argv.id, argv.name, argv.desc,argv.type,argv.gener, argv.franq, argv.num, argv.excl, argv.esp, argv.val));
+        const funko = new Funko(argv.id, argv.name, argv.desc,argv.type,argv.gener, argv.franq, argv.num, argv.excl, argv.esp, argv.val);
+        const request:RequestType = {
+            type:'update',
+            username: argv.user,
+            funkoPop: funko
+        }
+        socket.emit('request',request)
+        socket.on('response',(response:ResponseType)=>{
+            if(response.success){
+                console.log(response.successmsg)
+            }else{
+                console.error('No se pasaron los argumentos correctos al servidor')
+            }
+        })
     })
 
     .command('remove', 'borrar un funko', {
@@ -152,8 +173,19 @@ yargs(hideBin(process.argv))
         },
     
     }, (argv) => {
-    const user = new FunkoUserStorage(argv.user);
-    user.removeFunko(argv.id);
+        const request:RequestType = {
+            type:'remove',
+            username: argv.user,
+            id: argv.id
+        }
+        socket.emit('request',request)
+        socket.on('response',(response:ResponseType)=>{
+            if(response.success){
+                console.log(response.successmsg)
+            }else{
+                console.error('No se pasaron los argumentos correctos al servidor')
+            }
+        })
     })
 
     .command('show', 'muestra un funko', {
@@ -169,8 +201,19 @@ yargs(hideBin(process.argv))
         },
     
     }, (argv) => {
-    const user = new FunkoUserStorage(argv.user);
-    user.showFunko(argv.id);
+        const request:RequestType = {
+            type:'read',
+            username: argv.user,
+            id: argv.id
+        }
+        socket.emit('request',request)
+        socket.on('response',(response:ResponseType)=>{
+            if(response.success){
+                console.log(response.successmsg)
+            }else{
+                console.error('No se pasaron los argumentos correctos al servidor')
+            }
+        })
     })
 
 
@@ -183,8 +226,18 @@ yargs(hideBin(process.argv))
         }
     
     }, (argv) => {
-    const user = new FunkoUserStorage(argv.user);
-    user.listFunko();
+        const request:RequestType = {
+            type:'list',
+            username: argv.user,
+        }
+        socket.emit('request',request)
+        socket.on('response',(response:ResponseType)=>{
+            if(response.success){
+                console.log(response.successmsg)
+            }else{
+                console.error('No se pasaron los argumentos correctos al servidor')
+            }
+        })
     })
 
 .help()
